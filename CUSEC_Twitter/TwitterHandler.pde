@@ -11,29 +11,33 @@ class TwitterHandler {
   private Twitter twitter;
 
   // Class attributes
-  private ArrayList tweets;
   private StringList hashtags;
-  
   private ArrayList tweetees;
+  private String currentHashTag;
   
- 
-  private String currentHashTag = "";
+  int hashSize = 0;
+  int randomVar = (int) random(0, hashSize);
   
-  
-  
-  public TwitterHandler(ArrayList tweets, StringList hashtags){
+  public TwitterHandler(StringList hashtags){
     
-    this.setupTwitter();
-    
-    this.currentHashTag = currentHashTag; 
-    this.tweets = tweets;
+    this.currentHashTag = ""; 
     this.hashtags = hashtags;
     this.tweetees = new ArrayList();
+    this.authenticate();
   }
-
+  
+  public String getTweet(int index){
+    TweetWord tweetword = (TweetWord) tweetees.get(index);
+    return tweetword.getText();
+  }
+  
   /**
-  *  Search twitter for the hashtag 
+  *  Determine if there is a hashtag
   */
+  public boolean hasTweets(){
+   return tweetees.size() - 1 > 0;
+  }
+  
   public void queryTwitter()
   {
     currentHashTag = hashtags.get(randomVar);
@@ -79,7 +83,7 @@ class TwitterHandler {
   /**
   *
   */
-  private void setupTwitter(){
+  private void authenticate(){
          
     ConfigurationBuilder cb = new ConfigurationBuilder();
     cb.setOAuthConsumerKey("LnOiYHKt7WQjVLN6sy6RJQ");

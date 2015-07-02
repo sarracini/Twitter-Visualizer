@@ -14,9 +14,6 @@ import java.util.Arrays;
 //For the visualization
 ArrayList<particle> particles=new ArrayList<particle>();
 ArrayList<spring> springs=new ArrayList<spring>();
-ArrayList tweets;
-String tweet[];
-String newTweet[] = new String[0];
 
 //nodes
 particle letter;
@@ -29,15 +26,6 @@ float scaleVal;  //how much I'm scaling down form OF original
 float letterDist;   //space from word node to letter
 float wordDist;     //space from sentence node to word node
 float sentenceDist;  //space from base node to sentence node
-
-
-StringList hashtags = new StringList();
-String currentHashTag = "";
-
-int hashSize = 0;//2;
-int randomVar = (int) random(0, hashSize);
-
-Twitter twitter;
 
 // fonts
 PFont pMainHash;
@@ -59,6 +47,9 @@ String theLetter;
 
 
 TwitterHandler twitterHandler;
+StringList hashtags = new StringList();
+int hashSize = 0;
+int randomVar = (int) random(0, hashSize);
 
 /**
 *  Just processing things, builds stuff before app can be displayed.
@@ -85,18 +76,8 @@ void setup() {
 
   // Read in a file that contains hashtags to query for
   readInFile();
-
-  // twitter credentials
-  ConfigurationBuilder cb = new ConfigurationBuilder();
-  cb.setOAuthConsumerKey("LnOiYHKt7WQjVLN6sy6RJQ");
-  cb.setOAuthConsumerSecret("tW23dNjZ7QAfPFF7Pz3aktKh7f8WTec2wtPkYZkHwNc");
-  cb.setOAuthAccessToken("562619363-5asMhVErH1LtNExKudZKBx8aUHwpuuwbbke3I4Df");
-  cb.setOAuthAccessTokenSecret("gj5wqb48o4D6cK5SlCbrfbqOVoAG2zj6N6fqKl5z9ge7c");
-
-  // make a twitter object & query for random hashtag
-  twitter = new TwitterFactory(cb.build()).getInstance();
   
-  twitterHandler = new TwitterHandler(tweets, hashtags);
+  twitterHandler = new TwitterHandler(hashtags);
   twitterHandler.queryTwitter();
   
   println("this happened");
@@ -120,43 +101,42 @@ void draw() {
   textFont(pMainHash,15);
 
    if(millis() - lastTime > 30000){
-    reset();
-    println("20 seconds have gone by");
-    lastTime = millis();
-    //queryTwitter();
-    twitterHandler.queryTwitter();
+     // reset();
+      println("20 seconds have gone by");
+      lastTime = millis();
+      twitterHandler.queryTwitter();
+      
+      for (int i = particles.size()-1; i >= 0; i--){
+        particles.remove(i);
+        springs.remove(i);
+        println(particles.size());
+        background(0);
+      }
+      for(int i = 0; i < 7; i++){
+        particle myParticle;
+        scaleVal = scaleVal;
+        float angle = atan2(letter.pos.y-word.pos.y, letter.pos.x);
+        myParticle = new particle();
+        fill(random(120, 255), random(120, 255), random(120, 255));
+        myParticle.setInitialCondition(word.pos.x+cos(angle)*letterDist + i*10, word.pos.y+sin(angle)*letterDist, 0, 0);
+        addSpring(letterDist, 0.62, word, myParticle);
+        TweetWord tweetword = (TweetWord) twitterHandler.getTweetees().get(i);
+        String tmp = tweetword.getText();
+        myParticle.thisIsTheTweet = tmp;
+        particles.add(myParticle);
+        println("HERE: " + i + "  " + tmp); 
+      } 
+  }
 
-    for (int i = particles.size()-1; i >= 0; i--){
-      particles.remove(i);
-      springs.remove(i);
-      println(particles.size());
-      background(0);
-    }
-    for(int i = 0; i < 7; i++){
-      particle myParticle;
-      scaleVal = scaleVal;
-      float angle = atan2(letter.pos.y-word.pos.y, letter.pos.x);
-      myParticle = new particle();
-      fill(random(120, 255), random(120, 255), random(120, 255));
-      myParticle.setInitialCondition(word.pos.x+cos(angle)*letterDist + i*10, word.pos.y+sin(angle)*letterDist, 0, 0);
-      addSpring(letterDist, 0.62, word, myParticle);
-      TweetWord tweetword = (TweetWord) twitterHandler.getTweetees().get(i);
-      String tmp = tweetword.getText();
-      myParticle.thisIsTheTweet = tmp;
-      particles.add(myParticle);
-      println("HERE: " + i + "  " + tmp); 
-    } 
-}
-
- // to draw the scale of the arms properly
- for (int i = 0 ; i < twitterHandler.getTweetees().size(); i++) {
+   // to draw the scale of the arms properly
+   for (int i = 0 ; i < twitterHandler.getTweetees().size(); i++) {
     float tempScaleVal = 25.75;
     float normScale = map(tempScaleVal, 0, 17, .45, 2);
     scaleVal = normScale;
-  }
+    }
 
-  letterDist = 70*scaleVal;  //centre node to tweet particle distance
-  wordDist = 130*scaleVal;   //spacing between tweet arms
+   letterDist = 70*scaleVal;  //centre node to tweet particle distance
+   wordDist = 130*scaleVal;   //spacing between tweet arms
 
   // don't ever touch this it makes things move
   for (int i = 0; i < particles.size(); i++) {
@@ -178,10 +158,8 @@ void draw() {
 
 
   
-  if (hasFileChanged == true) {
-    int availableTweets =  twitterHandler.getTweetees().size();
+  if (hasFileChanged == true) {;
     hasFileChanged = false;
-    tweet = newTweet;
     particles=new ArrayList<particle>();
     springs=new ArrayList<spring>();
 
@@ -195,18 +173,14 @@ void draw() {
         addSpring(letterDist, 0.62, word, myParticle);
 
         // Check if we have a tweet to show
-        if(availableTweets > i) { 
-          TweetWord tweetword = (TweetWord) twitterHandler.getTweetees().get(i);
-          String tmp = tweetword.getText();
-          myParticle.thisIsTheTweet = tmp;
-          particles.add(myParticle);
-          println("Tweet: " + i + " " + tmp);
-        }else if(availableTweets < i){ 
-          
+        if(twitterHandler.hasTweets()) { 
+          myParticle.thisIsTheTweet = twitterHandler.getTweet(i);
+          //println("Tweet: " + i + " " + tmp);
         } else {
-          myParticle.thisIsTheTweet = "Well this is awkward\n" + twitterHandler.getCurrentHashTag() + " is on vacation, come back soon!";
-          particles.add(myParticle);
+          myParticle.thisIsTheTweet = "Well this is awkward\n" + twitterHandler.getCurrentHashTag() 
+                                      + " is on vacation, come back soon!";
         }
+        particles.add(myParticle);
      }
 
     }
@@ -256,12 +230,4 @@ void addSpring(float dist, float springiness, particle a, particle b) {
   mySpring.particleA = a;
   mySpring.particleB = b;
   springs.add(mySpring);
-}
-
-/**
-* Resets the arrays tweets and tweetees.
-*/
-void reset(){
-  tweets = new ArrayList();
-  //tweetees = new ArrayList();
 }
