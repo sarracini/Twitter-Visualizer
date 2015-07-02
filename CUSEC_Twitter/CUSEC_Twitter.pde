@@ -32,8 +32,9 @@ float sentenceDist;  //space from base node to sentence node
 
 StringList hashtags = new StringList();
 ArrayList tweetees = new ArrayList();
+String currentHashTag = "";
 
-int hashSize = hashtags.size();//2;
+int hashSize = 0;//2;
 int randomVar = (int) random(0, hashSize);
 
 Twitter twitter;
@@ -56,6 +57,9 @@ long lastTime = 0;
 
 String theLetter;
 
+/**
+*  Just processing things, builds stuff before app can be displayed.
+*/
 void setup() {
   size(displayWidth, displayHeight);
   noStroke();
@@ -92,6 +96,9 @@ void setup() {
   println("this happened");
 }
 
+/**
+*  Clearly this wants to draw, no seriously draw the UI please.
+*/
 void draw() {
   background(0);
   smooth();
@@ -163,37 +170,36 @@ void draw() {
   }
 
 
-  int availableTweets =  tweetees.size();
+  
   if (hasFileChanged == true) {
+    int availableTweets =  tweetees.size();
     hasFileChanged = false;
     tweet = newTweet;
     particles=new ArrayList<particle>();
     springs=new ArrayList<spring>();
 
       for (int i = 0; i < 7; i++){
-      particle myParticle;
-      scaleVal = scaleVal;
-      float angle = atan2(letter.pos.y-word.pos.y, letter.pos.x);
-      myParticle = new particle();
-      fill(random(120, 255), random(120, 255), random(120, 255));
-      myParticle.setInitialCondition(word.pos.x+cos(angle)*letterDist + i*10, word.pos.y+sin(angle)*letterDist, 0, 0);
-      addSpring(letterDist, 0.62, word, myParticle);
+        particle myParticle;
+        scaleVal = scaleVal;
+        float angle = atan2(letter.pos.y-word.pos.y, letter.pos.x);
+        myParticle = new particle();
+        fill(random(120, 255), random(120, 255), random(120, 255));
+        myParticle.setInitialCondition(word.pos.x+cos(angle)*letterDist + i*10, word.pos.y+sin(angle)*letterDist, 0, 0);
+        addSpring(letterDist, 0.62, word, myParticle);
 
-      // Check if we have a tweet to show
-      if(tweetees.size() > i) { 
-        TweetWord tweetword = (TweetWord) tweetees.get(i);
-        String tmp = tweetword.getText();
-        myParticle.thisIsTheTweet = tmp;
-        particles.add(myParticle);
-        println("Tweet: " + i + " " + tmp);
-      } 
-      if (availableTweets == 0) {
-      String tmp = "None at this time";
-      myParticle.thisIsTheTweet = tmp;
-      particles.add(myParticle);
-      println("Tweet: " + "0 " + tmp);
-    }
-
+        // Check if we have a tweet to show
+        if(availableTweets > i) { 
+          TweetWord tweetword = (TweetWord) tweetees.get(i);
+          String tmp = tweetword.getText();
+          myParticle.thisIsTheTweet = tmp;
+          particles.add(myParticle);
+          println("Tweet: " + i + " " + tmp);
+        }else if(availableTweets < i){ 
+          
+        } else {
+          myParticle.thisIsTheTweet = "Well this is awkward\n" + currentHashTag + " is on vacation, come back soon!";
+          particles.add(myParticle);
+        }
      }
 
     }
@@ -212,9 +218,13 @@ void draw() {
 
 }
 
+/**
+*  Search twitter for the hashtag 
+*/
 public void queryTwitter()
 {
-  Query query = new Query(hashtags.get(randomVar));
+  currentHashTag = hashtags.get(randomVar);
+  Query query = new Query(currentHashTag);
   query.count(100);
   println("Chosen hashtag: " + hashtags.get(randomVar).toString());
 
@@ -244,7 +254,9 @@ public void queryTwitter()
   }
 }
 
-
+/**
+*  Util to read the file of hashtags
+*/
 public void readInFile()
 {
   r = createReader("hashtags.txt");
@@ -254,6 +266,7 @@ public void readInFile()
       String[] words = split(line, "\n");
       hashtags.append(words);
     }
+    hashSize = hashtags.size();
   } 
   catch (IOException e)
   {
@@ -261,6 +274,10 @@ public void readInFile()
     line = null;
   }
 }
+
+/**
+*  kk spring?
+*/ 
 void addSpring(float dist, float springiness, particle a, particle b) {
   spring mySpring = new spring();
   mySpring.distance = dist;
@@ -270,6 +287,9 @@ void addSpring(float dist, float springiness, particle a, particle b) {
   springs.add(mySpring);
 }
 
+/**
+* Resets the arrays tweets and tweetees.
+*/
 void reset(){
   tweets = new ArrayList();
   tweetees = new ArrayList();
