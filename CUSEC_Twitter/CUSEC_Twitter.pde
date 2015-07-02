@@ -48,8 +48,6 @@ String theLetter;
 
 TwitterHandler twitterHandler;
 StringList hashtags = new StringList();
-int hashSize = 0;
-int randomVar = (int) random(0, hashSize);
 
 /**
 *  Just processing things, builds stuff before app can be displayed.
@@ -92,7 +90,7 @@ void draw() {
   textAlign(CENTER, CENTER);
 
   // Draw the main hashtag
-  item = hashtags.get(randomVar);
+  item = twitterHandler.getCurrentHashTag();
   textFont(pMainHash);
   hashTag theHashTag = new hashTag(item, (displayWidth/4)-415, (displayHeight/4)-300, 600, 200);
   theHashTag.drawTheHashTag();
@@ -101,7 +99,6 @@ void draw() {
   textFont(pMainHash,15);
 
    if(millis() - lastTime > 30000){
-     // reset();
       println("20 seconds have gone by");
       lastTime = millis();
       twitterHandler.queryTwitter();
@@ -112,6 +109,7 @@ void draw() {
         println(particles.size());
         background(0);
       }
+      
       for(int i = 0; i < 7; i++){
         particle myParticle;
         scaleVal = scaleVal;
@@ -120,16 +118,13 @@ void draw() {
         fill(random(120, 255), random(120, 255), random(120, 255));
         myParticle.setInitialCondition(word.pos.x+cos(angle)*letterDist + i*10, word.pos.y+sin(angle)*letterDist, 0, 0);
         addSpring(letterDist, 0.62, word, myParticle);
-        TweetWord tweetword = (TweetWord) twitterHandler.getTweetees().get(i);
-        String tmp = tweetword.getText();
-        myParticle.thisIsTheTweet = tmp;
+        myParticle.thisIsTheTweet = twitterHandler.getTweet(i);
         particles.add(myParticle);
-        println("HERE: " + i + "  " + tmp); 
       } 
   }
 
    // to draw the scale of the arms properly
-   for (int i = 0 ; i < twitterHandler.getTweetees().size(); i++) {
+   for (int i = 0 ; i < twitterHandler.getTweeteesSize(); i++) {
     float tempScaleVal = 25.75;
     float normScale = map(tempScaleVal, 0, 17, .45, 2);
     scaleVal = normScale;
@@ -175,7 +170,6 @@ void draw() {
         // Check if we have a tweet to show
         if(twitterHandler.hasTweets()) { 
           myParticle.thisIsTheTweet = twitterHandler.getTweet(i);
-          //println("Tweet: " + i + " " + tmp);
         } else {
           myParticle.thisIsTheTweet = "Well this is awkward\n" + twitterHandler.getCurrentHashTag() 
                                       + " is on vacation, come back soon!";
@@ -211,7 +205,6 @@ public void readInFile()
       String[] words = split(line, "\n");
       hashtags.append(words);
     }
-    hashSize = hashtags.size();
   } 
   catch (IOException e)
   {

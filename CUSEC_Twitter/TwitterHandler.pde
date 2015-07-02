@@ -14,11 +14,13 @@ class TwitterHandler {
   private StringList hashtags;
   private ArrayList tweetees;
   private String currentHashTag;
+  private ArrayList tweets;
   
   int hashSize = 0;
-  int randomVar = (int) random(0, hashSize);
   
   public TwitterHandler(StringList hashtags){
+    
+    tweets = new ArrayList();
     
     this.currentHashTag = ""; 
     this.hashtags = hashtags;
@@ -26,13 +28,24 @@ class TwitterHandler {
     this.authenticate();
   }
   
+  public int getTweeteesSize(){
+   return this.tweetees.size(); 
+  }
+  
+  public int getAmountOfHashtags(){
+   return this.hashtags.size(); 
+  }
+  
+  /**
+  *
+  */
   public String getTweet(int index){
     TweetWord tweetword = (TweetWord) tweetees.get(index);
     return tweetword.getText();
   }
   
   /**
-  *  Determine if there is a hashtag
+  *  Determine if there is a tweet
   */
   public boolean hasTweets(){
    return tweetees.size() - 1 > 0;
@@ -40,11 +53,10 @@ class TwitterHandler {
   
   public void queryTwitter()
   {
-    currentHashTag = hashtags.get(randomVar);
+    currentHashTag = hashtags.get((int) random(0, this.getAmountOfHashtags()));
     
     Query query = new Query(currentHashTag);
     query.count(100);
-    println("Chosen hashtag: " + hashtags.get(randomVar).toString());
 
     try {
       // search twitter for the hashtag at randomvar
