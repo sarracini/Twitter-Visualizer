@@ -32,7 +32,6 @@ float sentenceDist;  //space from base node to sentence node
 
 
 StringList hashtags = new StringList();
-ArrayList tweetees = new ArrayList();
 String currentHashTag = "";
 
 int hashSize = 0;//2;
@@ -141,7 +140,7 @@ void draw() {
       fill(random(120, 255), random(120, 255), random(120, 255));
       myParticle.setInitialCondition(word.pos.x+cos(angle)*letterDist + i*10, word.pos.y+sin(angle)*letterDist, 0, 0);
       addSpring(letterDist, 0.62, word, myParticle);
-      TweetWord tweetword = (TweetWord) tweetees.get(i);
+      TweetWord tweetword = (TweetWord) twitterHandler.getTweetees().get(i);
       String tmp = tweetword.getText();
       myParticle.thisIsTheTweet = tmp;
       particles.add(myParticle);
@@ -150,7 +149,7 @@ void draw() {
 }
 
  // to draw the scale of the arms properly
- for (int i = 0 ; i < tweetees.size(); i++) {
+ for (int i = 0 ; i < twitterHandler.getTweetees().size(); i++) {
     float tempScaleVal = 25.75;
     float normScale = map(tempScaleVal, 0, 17, .45, 2);
     scaleVal = normScale;
@@ -180,7 +179,7 @@ void draw() {
 
   
   if (hasFileChanged == true) {
-    int availableTweets =  tweetees.size();
+    int availableTweets =  twitterHandler.getTweetees().size();
     hasFileChanged = false;
     tweet = newTweet;
     particles=new ArrayList<particle>();
@@ -197,7 +196,7 @@ void draw() {
 
         // Check if we have a tweet to show
         if(availableTweets > i) { 
-          TweetWord tweetword = (TweetWord) tweetees.get(i);
+          TweetWord tweetword = (TweetWord) twitterHandler.getTweetees().get(i);
           String tmp = tweetword.getText();
           myParticle.thisIsTheTweet = tmp;
           particles.add(myParticle);
@@ -224,44 +223,6 @@ void draw() {
 
   text("Coded with love by Ursula & Nichie", displayWidth/4-130, displayHeight/4+700);
 
-}
-
-/**
-*  Depricated: Please use -> twitterHandler.queryTwitter();
-*
-*  Search twitter for the hashtag 
-*/
-public void queryTwitter()
-{
-  currentHashTag = hashtags.get(randomVar);
-  Query query = new Query(currentHashTag);
-  query.count(100);
-  println("Chosen hashtag: " + hashtags.get(randomVar).toString());
-
-  try {
-    // search twitter for the hashtag at randomvar
-    QueryResult result = twitter.search(query);
-    // put ALL instances of found tweets in arraylist "tweets" & iterate 
-    tweets = (ArrayList) result.getTweets();
-    int size = tweets.size();
-    println("Number of tweets available: " + (size));
-    for (int i = 0; i < tweets.size(); i++)
-    {
-      // create a username & status encapsulated in "twit" tweet object
-      // add all "twits" to an arraylist of tweet objects called "tweetees"
-      // haha
-      Status t = (Status) tweets.get(i);
-      User user = (User) t.getUser();
-      String msg = t.getText();
-      String name = user.getScreenName();
-      TweetWord twit = new TweetWord(name, msg);
-      tweetees.add(twit);
-
-    }
-  } 
-  catch (TwitterException e) {
-    println("Couldn't connect: " + e);
-  }
 }
 
 /**
@@ -302,5 +263,5 @@ void addSpring(float dist, float springiness, particle a, particle b) {
 */
 void reset(){
   tweets = new ArrayList();
-  tweetees = new ArrayList();
+  //tweetees = new ArrayList();
 }

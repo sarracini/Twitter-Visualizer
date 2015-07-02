@@ -14,8 +14,9 @@ class TwitterHandler {
   private ArrayList tweets;
   private StringList hashtags;
   
+  private ArrayList tweetees;
   
-ArrayList tweetees = new ArrayList();
+ 
   private String currentHashTag = "";
   
   
@@ -27,6 +28,7 @@ ArrayList tweetees = new ArrayList();
     this.currentHashTag = currentHashTag; 
     this.tweets = tweets;
     this.hashtags = hashtags;
+    this.tweetees = new ArrayList();
   }
 
   /**
@@ -68,6 +70,10 @@ ArrayList tweetees = new ArrayList();
   
   public String getCurrentHashTag() {
    return this.currentHashTag; 
+  }
+  
+  public ArrayList getTweetees() {
+   return this.tweetees; 
   }
   
   /**
