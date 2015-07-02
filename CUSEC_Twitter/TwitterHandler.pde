@@ -25,19 +25,25 @@ class TwitterHandler {
     this.currentHashTag = ""; 
     this.hashtags = hashtags;
     this.tweetees = new ArrayList();
-    this.authenticate();
+    this.twitter = this.authenticate();
   }
   
+  /**
+  *  Returns the size of the tweetees array
+  */
   public int getTweeteesSize(){
    return this.tweetees.size(); 
   }
   
+  /**
+  *  Return the amount of hashtags in the hashtag list
+  */
   public int getAmountOfHashtags(){
    return this.hashtags.size(); 
   }
   
   /**
-  *
+  *  gets the tweet at the indicated index
   */
   public String getTweet(int index){
     TweetWord tweetword = (TweetWord) tweetees.get(index);
@@ -51,12 +57,15 @@ class TwitterHandler {
    return tweetees.size() - 1 > 0;
   }
   
+  /**
+  *  Search twitter for a list of tweets
+  */
   public void queryTwitter()
   {
     currentHashTag = hashtags.get((int) random(0, this.getAmountOfHashtags()));
     
     Query query = new Query(currentHashTag);
-    query.count(100);
+    query.count(7);
 
     try {
       // search twitter for the hashtag at randomvar
@@ -84,26 +93,31 @@ class TwitterHandler {
     }
   }
   
+  /**
+  *  Get the current hashtag 
+  */
   public String getCurrentHashTag() {
    return this.currentHashTag; 
   }
   
+  /**
+  *  Get the current list of tweetees
+  */
   public ArrayList getTweetees() {
    return this.tweetees; 
   }
   
   /**
-  *
+  *  Connect to twitter with authentication tokens
   */
-  private void authenticate(){
+  private TwitterFactory authenticate(){
          
     ConfigurationBuilder cb = new ConfigurationBuilder();
     cb.setOAuthConsumerKey("LnOiYHKt7WQjVLN6sy6RJQ");
     cb.setOAuthConsumerSecret("tW23dNjZ7QAfPFF7Pz3aktKh7f8WTec2wtPkYZkHwNc");
     cb.setOAuthAccessToken("562619363-5asMhVErH1LtNExKudZKBx8aUHwpuuwbbke3I4Df");
     cb.setOAuthAccessTokenSecret("gj5wqb48o4D6cK5SlCbrfbqOVoAG2zj6N6fqKl5z9ge7c");
-    
-    this.twitter = new TwitterFactory(cb.build()).getInstance(); 
+    return new TwitterFactory(cb.build()).getInstance(); 
   }
 
 }
