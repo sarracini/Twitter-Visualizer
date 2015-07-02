@@ -30,6 +30,7 @@ float letterDist;   //space from word node to letter
 float wordDist;     //space from sentence node to word node
 float sentenceDist;  //space from base node to sentence node
 
+
 StringList hashtags = new StringList();
 ArrayList tweetees = new ArrayList();
 String currentHashTag = "";
@@ -56,6 +57,9 @@ boolean hasFileChanged = true;
 long lastTime = 0;
 
 String theLetter;
+
+
+TwitterHandler twitterHandler;
 
 /**
 *  Just processing things, builds stuff before app can be displayed.
@@ -92,7 +96,10 @@ void setup() {
 
   // make a twitter object & query for random hashtag
   twitter = new TwitterFactory(cb.build()).getInstance();
-  queryTwitter();
+  
+  twitterHandler = new TwitterHandler(tweets, hashtags);
+  twitterHandler.queryTwitter();
+  
   println("this happened");
 }
 
@@ -117,7 +124,8 @@ void draw() {
     reset();
     println("20 seconds have gone by");
     lastTime = millis();
-    queryTwitter();
+    //queryTwitter();
+    twitterHandler.queryTwitter();
 
     for (int i = particles.size()-1; i >= 0; i--){
       particles.remove(i);
@@ -197,7 +205,7 @@ void draw() {
         }else if(availableTweets < i){ 
           
         } else {
-          myParticle.thisIsTheTweet = "Well this is awkward\n" + currentHashTag + " is on vacation, come back soon!";
+          myParticle.thisIsTheTweet = "Well this is awkward\n" + twitterHandler.getCurrentHashTag() + " is on vacation, come back soon!";
           particles.add(myParticle);
         }
      }
@@ -219,6 +227,8 @@ void draw() {
 }
 
 /**
+*  Depricated: Please use -> twitterHandler.queryTwitter();
+*
 *  Search twitter for the hashtag 
 */
 public void queryTwitter()
