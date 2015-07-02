@@ -33,7 +33,7 @@ float sentenceDist;  //space from base node to sentence node
 StringList hashtags = new StringList();
 ArrayList tweetees = new ArrayList();
 
-int hashSize = 2;
+int hashSize = hashtags.size();//2;
 int randomVar = (int) random(0, hashSize);
 
 Twitter twitter;
@@ -60,11 +60,11 @@ void setup() {
   size(displayWidth, displayHeight);
   noStroke();
   smooth();
-  
+
   // set fonts
   pMainHash = createFont("Montserrat", 65);
   //pTweets = createFont("Raleway", 16);
-  
+
   // particle
   particle myParticle;
 
@@ -96,7 +96,7 @@ void draw() {
   background(0);
   smooth();
   textAlign(CENTER, CENTER);
-  
+
   // Draw the main hashtag
   item = hashtags.get(randomVar);
   textFont(pMainHash);
@@ -105,13 +105,13 @@ void draw() {
   textFont(pMainHash,19);
   text("Tweet with " + item + " and see it here!", displayWidth/4-122, displayHeight/4-150);
   textFont(pMainHash,15);
- 
+
    if(millis() - lastTime > 30000){
     reset();
     println("20 seconds have gone by");
     lastTime = millis();
     queryTwitter();
-    
+
     for (int i = particles.size()-1; i >= 0; i--){
       particles.remove(i);
       springs.remove(i);
@@ -133,17 +133,17 @@ void draw() {
       println("HERE: " + i + "  " + tmp); 
     } 
 }
- 
+
  // to draw the scale of the arms properly
  for (int i = 0 ; i < tweetees.size(); i++) {
     float tempScaleVal = 25.75;
     float normScale = map(tempScaleVal, 0, 17, .45, 2);
     scaleVal = normScale;
   }
-  
+
   letterDist = 70*scaleVal;  //centre node to tweet particle distance
   wordDist = 130*scaleVal;   //spacing between tweet arms
-  
+
   // don't ever touch this it makes things move
   for (int i = 0; i < particles.size(); i++) {
     particles.get(i).resetForce();
@@ -161,13 +161,15 @@ void draw() {
     particles.get(i).addDampingForce();
     particles.get(i).update();
   }
-  
+
+
+  int availableTweets =  tweetees.size();
   if (hasFileChanged == true) {
     hasFileChanged = false;
     tweet = newTweet;
     particles=new ArrayList<particle>();
     springs=new ArrayList<spring>();
-    
+
       for (int i = 0; i < 7; i++){
       particle myParticle;
       scaleVal = scaleVal;
@@ -176,25 +178,36 @@ void draw() {
       fill(random(120, 255), random(120, 255), random(120, 255));
       myParticle.setInitialCondition(word.pos.x+cos(angle)*letterDist + i*10, word.pos.y+sin(angle)*letterDist, 0, 0);
       addSpring(letterDist, 0.62, word, myParticle);
-      TweetWord tweetword = (TweetWord) tweetees.get(i);
-      String tmp = tweetword.getText();
+
+      // Check if we have a tweet to show
+      if(tweetees.size() > i) { 
+        TweetWord tweetword = (TweetWord) tweetees.get(i);
+        String tmp = tweetword.getText();
+        myParticle.thisIsTheTweet = tmp;
+        particles.add(myParticle);
+        println("Tweet: " + i + " " + tmp);
+      } 
+      if (availableTweets == 0) {
+      String tmp = "None at this time";
       myParticle.thisIsTheTweet = tmp;
       particles.add(myParticle);
-      println("Tweet: " + i + " " + tmp);
-      
-      } 
+      println("Tweet: " + "0 " + tmp);
     }
+
+     }
+
+    }
+
   // draw particles
  for (int i = 0; i < 7; i++) {   
-    particles.get(i).draw();
-
+    if(particles.size() > i) particles.get(i).draw();
   }
   // draw lines
    stroke(255, 100);
   for (int i = 0; i < springs.size(); i++) {
     springs.get(i).draw();
   }
-  
+
   text("Coded with love by Ursula & Nichie", displayWidth/4-130, displayHeight/4+700);
 
 }
@@ -223,7 +236,7 @@ public void queryTwitter()
       String name = user.getScreenName();
       TweetWord twit = new TweetWord(name, msg);
       tweetees.add(twit);
-      
+
     }
   } 
   catch (TwitterException e) {
