@@ -1,4 +1,7 @@
 # Twitter-Visualizer
+
+/play sexyback
+
 This application queries twitter for tweets with the hashtag #CUSEC2015 and displays them in a circular sun web fashion.
 
 This was made for the Canadian Universities Software Engineering Conference of 2015 to display a live feed of all the tweets with that hashtag during the conference. 
