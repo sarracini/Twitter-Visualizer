@@ -77,8 +77,6 @@ void setup() {
   
   twitterHandler = new TwitterHandler(hashtags);
   twitterHandler.queryTwitter();
-  
-  println("this happened");
 }
 
 /**
@@ -99,7 +97,6 @@ void draw() {
   textFont(pMainHash,15);
 
    if(millis() - lastTime > 30000){
-      println("20 seconds have gone by");
       lastTime = millis();
       twitterHandler.queryTwitter();
       
@@ -151,9 +148,7 @@ void draw() {
     particles.get(i).update();
   }
 
-
-  
-  if (hasFileChanged == true) {;
+  if (hasFileChanged == true) {
     hasFileChanged = false;
     particles=new ArrayList<particle>();
     springs=new ArrayList<spring>();
@@ -214,7 +209,7 @@ public void readInFile()
 }
 
 /**
-*  kk spring?
+*  Spring behaviour
 */ 
 void addSpring(float dist, float springiness, particle a, particle b) {
   spring mySpring = new spring();

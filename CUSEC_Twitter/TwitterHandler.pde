@@ -25,7 +25,13 @@ class TwitterHandler {
     this.currentHashTag = ""; 
     this.hashtags = hashtags;
     this.tweetees = new ArrayList();
-    this.twitter = this.authenticate();
+    
+    ConfigurationBuilder cb = new ConfigurationBuilder();
+    cb.setOAuthConsumerKey("*******************");
+    cb.setOAuthConsumerSecret("****************");
+    cb.setOAuthAccessToken("*******************");
+    cb.setOAuthAccessTokenSecret("*************");
+    this.twitter = new TwitterFactory(cb.build()).getInstance(); 
   }
   
   /**
@@ -106,18 +112,4 @@ class TwitterHandler {
   public ArrayList getTweetees() {
    return this.tweetees; 
   }
-  
-  /**
-  *  Connect to twitter with authentication tokens
-  */
-  private TwitterFactory authenticate(){
-         
-    ConfigurationBuilder cb = new ConfigurationBuilder();
-    cb.setOAuthConsumerKey("LnOiYHKt7WQjVLN6sy6RJQ");
-    cb.setOAuthConsumerSecret("tW23dNjZ7QAfPFF7Pz3aktKh7f8WTec2wtPkYZkHwNc");
-    cb.setOAuthAccessToken("562619363-5asMhVErH1LtNExKudZKBx8aUHwpuuwbbke3I4Df");
-    cb.setOAuthAccessTokenSecret("gj5wqb48o4D6cK5SlCbrfbqOVoAG2zj6N6fqKl5z9ge7c");
-    return new TwitterFactory(cb.build()).getInstance(); 
-  }
-
 }
