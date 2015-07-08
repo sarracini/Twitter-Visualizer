@@ -9,5 +9,7 @@ Ensure you have Processing downloaded (https://processing.org/) to run the appli
 
 If you want to use this for your own twitter visualizer (do it!), make sure to go into hashtags.txt and change the text file to read the hashtags that you want to be queried. The rest of the application will update itself dynamically to find and display the tweets which match the hashtags in the file.
 
+Make sure to visit Twitter's developers page to get OAuth credentials to build your own app using the REST API.
+
 #License
 MIT © Ursula Sarracini
